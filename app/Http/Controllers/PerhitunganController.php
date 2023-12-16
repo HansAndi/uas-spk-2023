@@ -23,6 +23,9 @@ class PerhitunganController extends Controller
         $matriksPreferensi = $this->matriksPreferensi($matriksNormalisasi, $kriteria);
         $ranking = $this->ranking($matriksPreferensi);
 
+        // $matriksNormalisasi[0][8] = round(1 / 6, 4);
+        // dd($matriksNormalisasi[0][8]);
+
         // foreach ($ranking as $key => $value) {
         //     $alternative = $alternatif->where('id', $key)->first();
         //     // dd($key, $value, $alternative);
@@ -82,8 +85,9 @@ class PerhitunganController extends Controller
         foreach ($matriksKeputusan as $key => $value) {
             foreach ($value as $key2 => $value2) {
                 if ($kriteria[$key2]->tipe == 'benefit') {
+                    // dd($this->maxValue($matriksKeputusan, $key2));
                     $matriksNormalisasi[$key][$key2] = $value2 / $this->maxValue($matriksKeputusan, $key2);
-                } else {
+                } else if ($kriteria[$key2]->tipe == 'cost') {
                     $matriksNormalisasi[$key][$key2] = $this->minValue($matriksKeputusan, $key2) / $value2;
                 }
             }
@@ -93,7 +97,7 @@ class PerhitunganController extends Controller
 
     public function maxValue($matriksKeputusan, $key)
     {
-        $maxValue = 0;
+        $maxValue = $matriksKeputusan[0][$key];
         foreach ($matriksKeputusan as $key2 => $value2) {
             if ($value2[$key] > $maxValue) {
                 $maxValue = $value2[$key];
@@ -104,7 +108,7 @@ class PerhitunganController extends Controller
 
     public function minValue($matriksKeputusan, $key)
     {
-        $minValue = 0;
+        $minValue = $matriksKeputusan[0][$key];
         foreach ($matriksKeputusan as $key2 => $value2) {
             if ($value2[$key] < $minValue) {
                 $minValue = $value2[$key];

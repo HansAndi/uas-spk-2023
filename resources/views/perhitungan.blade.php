@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="row justify-content-center">
-        <div class="col-10">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 class="card-title"></i>Bobot Kriteria</h3>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-10">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 class="card-title"></i>Matriks Keputusan</h3>
@@ -64,7 +64,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-10">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 class="card-title"></i>Matriks Normalisasi</h3>
@@ -83,7 +83,7 @@
                                 <tr>
                                     <td>{{ $alternatif[$i]->nama_alternatif }}</td>
                                     @for ($j = 0; $j < count($kriteria); $j++)
-                                        <td>{{ number_format($matriksNormalisasi[$i][$j], 4) }}</td>
+                                        <td>{{ number_format($matriksNormalisasi[$i][$j], 3) }}</td>
                                     @endfor
                                 </tr>
                             @endfor
@@ -95,7 +95,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-10">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 class="card-title"></i>Matriks Preferensi</h3>
@@ -111,7 +111,7 @@
                             @for ($i = 0; $i < count($alternatif); $i++)
                                 <tr>
                                     <td>{{ $alternatif[$i]->nama_alternatif }}</td>
-                                    <td>{{ number_format($matriksPreferensi[$i], 4) }}</td>
+                                    <td>{{ number_format($matriksPreferensi[$i], 3) }}</td>
                                 </tr>
                             @endfor
                         </tbody>
@@ -122,7 +122,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-10">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h3 class="card-title"></i>Ranking</h3>
@@ -154,7 +154,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $alternatif[$key]->nama_alternatif }}</td>
-                                    <td>{{ number_format($ranking[$key], 4) }}</td>
+                                    <td>{{ number_format($ranking[$key], 3) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

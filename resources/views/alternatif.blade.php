@@ -93,10 +93,11 @@
     <div class="modal fade" id="inputNilai" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <form action="{{ url('alternatif_kriteria') }}" method="POST">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <input name="nama_alternatif" class="modal-title form-control" id="namaAlternatif" value="">
+                        <input name="nama_alternatif" class="modal-title form-control" id="namaAlternatif" value=""
+                            readonly>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -105,19 +106,39 @@
                         @csrf
 
                         <input name="alternatif_id" id="idAlternatif" type="hidden">
-                        @foreach ($kriteria as $krt)
-                            <div class="form-group">
-                                <label for="nama_kriteria">{{ $krt->nama_kriteria }}</label>
-                                <select name="value[]" id="idKriteria" class="form-control">
-                                    @foreach ($subKriteria as $sk)
-                                        @if ($sk->kriteria_id == $krt->id)
-                                            <option value="{{ $sk->value }}">{{ $sk->range_kriteria }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                                <input name="id[]" id="idKriteria" type="hidden" value="{{ $krt->id }}">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                @foreach ($kriteria->take($kriteria->count() / 2) as $krt)
+                                    <div class="form-group">
+                                        <label for="nama_kriteria">{{ $krt->nama_kriteria }}</label>
+                                        <select name="value[]" id="idKriteria" class="form-control">
+                                            @foreach ($subKriteria as $sk)
+                                                @if ($sk->kriteria_id == $krt->id)
+                                                    <option value="{{ $sk->value }}">{{ $sk->range_kriteria }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <input name="id[]" id="idKriteria" type="hidden" value="{{ $krt->id }}">
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
+                            <div class="col-md-6">
+                                @foreach ($kriteria->skip($kriteria->count() / 2) as $krt)
+                                    <div class="form-group">
+                                        <label for="nama_kriteria">{{ $krt->nama_kriteria }}</label>
+                                        <select name="value[]" id="idKriteria" class="form-control">
+                                            @foreach ($subKriteria as $sk)
+                                                @if ($sk->kriteria_id == $krt->id)
+                                                    <option value="{{ $sk->value }}">{{ $sk->range_kriteria }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <input name="id[]" id="idKriteria" type="hidden" value="{{ $krt->id }}">
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
