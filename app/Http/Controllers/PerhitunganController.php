@@ -15,35 +15,30 @@ class PerhitunganController extends Controller
 
         $alternatif = alternatif::all();
         $kriteria = kriteria::all();
+        // dd($kriteria);
         $alternatif_kriteria = alternatif_kriteria::all();
         $alternatifKriteriaGrouped = $alternatif_kriteria->groupBy(['alternatif_id', 'kriteria_id']);
 
         $matriksKeputusan = $this->matriksKeputusan($alternatif, $kriteria, $alternatif_kriteria);
         $matriksNormalisasi = $this->matriksNormalisasi($matriksKeputusan, $kriteria);
-        $matriksPreferensi = $this->matriksPreferensi($matriksNormalisasi, $kriteria);
-        $ranking = $this->ranking($matriksPreferensi);
+        // dd($matriksNormalisasi);
+        // $matriksPreferensi = $this->matriksPreferensi($matriksNormalisasi, $kriteria);
+        $matriksNormalisasiTerbobot = $this->matriksNormalisasiTerbobot($matriksNormalisasi, $kriteria);
+        // dd($matriksNormalisasiTerbobot);
 
-        // $matriksNormalisasi[0][8] = round(1 / 6, 4);
-        // dd($matriksNormalisasi[0][8]);
+        $solusi_ideal_positif = $this->hitungSolusiIdealPositif($matriksNormalisasiTerbobot, $alternatif, $kriteria);
+        // dd($solusi_ideal_positif);
+        $solusi_ideal_negatif = $this->hitungSolusiIdealNegatif($matriksNormalisasiTerbobot);
 
-        // foreach ($ranking as $key => $value) {
-        //     $alternative = $alternatif->where('id', $key)->first();
-        //     // dd($key, $value, $alternative);
-        //     dd(number_format($ranking[$key], 4));
-        // }
+        $jarak_solusi_ideal_positif = $this->hitungJarakSolusiIdealPositif($matriksNormalisasiTerbobot, $solusi_ideal_positif);
+        // dd($jarak_solusi_ideal_positif);
+        $jarak_solusi_ideal_negatif = $this->hitungJarakSolusiIdealNegatif($matriksNormalisasiTerbobot, $solusi_ideal_negatif);
+        // dd($jarak_solusi_ideal_negatif);
 
-        // dd($ranking);
+        $matriksPreferensi = $this->hitungNilaiPreferensi($jarak_solusi_ideal_positif, $jarak_solusi_ideal_negatif);
         // dd($matriksPreferensi);
-
-        // return view('perhitungan')
-        //     ->with('alternatif', $alternatif)
-        //     ->with('kriteria', $kriteria)
-        //     ->with('alternatif_kriteria', $alternatif_kriteria)
-        //     // ->with('alternatifKriteriaGrouped', $alternatifKriteriaGrouped)
-        //     ->with('matriksKeputusan', $matriksKeputusan)
-        //     ->with('matriksNormalisasi', $matriksNormalisasi)
-        //     ->with('matriksPreferensi', $matriksPreferensi)
-        //     ->with('ranking', $ranking);
+        $ranking = $this->ranking($matriksPreferensi);
+        // dd($ranking);
 
         return view('perhitungan', [
             'alternatif' => $alternatif,
@@ -51,23 +46,17 @@ class PerhitunganController extends Controller
             'alternatif_kriteria' => $alternatif_kriteria,
             'matriksKeputusan' => $matriksKeputusan,
             'matriksNormalisasi' => $matriksNormalisasi,
+            'matriksNormalisasiTerbobot' => $matriksNormalisasiTerbobot,
+            'solusi_ideal_positif' => $solusi_ideal_positif,
+            'solusi_ideal_negatif' => $solusi_ideal_negatif,
+            'jarak_solusi_ideal_positif' => $jarak_solusi_ideal_positif,
+            'jarak_solusi_ideal_negatif' => $jarak_solusi_ideal_negatif,
             'matriksPreferensi' => $matriksPreferensi,
             'ranking' => $ranking,
         ]);
     }
 
-    // public function matriksKeputusan($alternatif, $kriteria, $alternatif_kriteria)
-    // {
-    //     $matriksKeputusan = [];
-    //     foreach ($alternatif as $key => $value) {
-    //         foreach ($kriteria as $key2 => $value2) {
-    //             $matriksKeputusan[$key][$key2] = $alternatif_kriteria[$value->id][$value2->id][0]->value;
-    //         }
-    //     }
-    //     return $matriksKeputusan;
-    // }
-
-    public function matriksKeputusan($alternatif, $kriteria, $alternatif_kriteria)
+    private function matriksKeputusan($alternatif, $kriteria, $alternatif_kriteria)
     {
         $matriksKeputusan = [];
         foreach ($alternatif as $key => $value) {
@@ -78,59 +67,113 @@ class PerhitunganController extends Controller
         return $matriksKeputusan;
     }
 
-    //create matriks normalisasi where if kriteria->type == 'benefit' then value / max value else min value / value
-    public function matriksNormalisasi($matriksKeputusan, $kriteria)
+    private function matriksNormalisasi($matriksKeputusan)
     {
         $matriksNormalisasi = [];
-        foreach ($matriksKeputusan as $key => $value) {
-            foreach ($value as $key2 => $value2) {
-                if ($kriteria[$key2]->tipe == 'benefit') {
-                    // dd($this->maxValue($matriksKeputusan, $key2));
-                    $matriksNormalisasi[$key][$key2] = $value2 / $this->maxValue($matriksKeputusan, $key2);
-                } else if ($kriteria[$key2]->tipe == 'cost') {
-                    $matriksNormalisasi[$key][$key2] = $this->minValue($matriksKeputusan, $key2) / $value2;
-                }
+        for ($j = 0; $j < count($matriksKeputusan[0]); $j++) {
+            $jumlah_kuadrat = 0;
+            for ($i = 0; $i < count($matriksKeputusan); $i++) {
+                $jumlah_kuadrat += pow($matriksKeputusan[$i][$j], 2);
+            }
+            for ($i = 0; $i < count($matriksKeputusan); $i++) {
+                $matriksNormalisasi[$i][$j] = number_format($matriksKeputusan[$i][$j] / sqrt($jumlah_kuadrat), 4);
             }
         }
         return $matriksNormalisasi;
     }
 
-    public function maxValue($matriksKeputusan, $key)
+    private function matriksNormalisasiTerbobot($matriksNormalisasi, $kriteria)
     {
-        $maxValue = $matriksKeputusan[0][$key];
-        foreach ($matriksKeputusan as $key2 => $value2) {
-            if ($value2[$key] > $maxValue) {
-                $maxValue = $value2[$key];
+        $matriksNormalisasiTerbobot = [];
+        for ($i = 0; $i < count($matriksNormalisasi); $i++) {
+            $matriksNormalisasiTerbobot[$i] = [];
+            for ($j = 0; $j < count($matriksNormalisasi[0]); $j++) {
+                $matriksNormalisasiTerbobot[$i][$j] = number_format($matriksNormalisasi[$i][$j] * $kriteria[$j]->bobot, 4);
             }
         }
-        return $maxValue;
+        return $matriksNormalisasiTerbobot;
     }
 
-    public function minValue($matriksKeputusan, $key)
+    private function hitungSolusiIdealPositif($matriksNormalisasiTerbobot, $alternatif, $kriteria)
     {
-        $minValue = $matriksKeputusan[0][$key];
-        foreach ($matriksKeputusan as $key2 => $value2) {
-            if ($value2[$key] < $minValue) {
-                $minValue = $value2[$key];
+        $type = kriteria::pluck('tipe')->toArray();
+        // dd($type);
+        $solusi_ideal_positif = [];
+        for ($j = 0; $j < count($matriksNormalisasiTerbobot[0]); $j++) {
+            $column = array_column($matriksNormalisasiTerbobot, $j);
+            $max = max($column);
+            $min = min($column);
+            if (isset($type[$j])) {
+                if ($type[$j] == 'Benefit' || $type[$j] == 'benefit') {
+                    $solusi_ideal_positif[$j] = $max;
+                } else if ($type[$j] == 'Cost' || $type[$j] == 'cost') {
+                    $solusi_ideal_positif[$j] = $min;
+                }
             }
         }
-        return $minValue;
+        return $solusi_ideal_positif;
     }
 
-    //create matriks preferensi where sum of kriteria->bobot * matriksNormalisasi
-    public function matriksPreferensi($matriksNormalisasi, $kriteria)
+    private function hitungSolusiIdealNegatif($matriksNormalisasiTerbobot)
     {
-        $matriksPreferensi = [];
-        foreach ($matriksNormalisasi as $key => $value) {
-            $matriksPreferensi[$key] = 0;
-            foreach ($value as $key2 => $value2) {
-                $matriksPreferensi[$key] += $kriteria[$key2]->bobot * $value2;
+        $type = kriteria::pluck('tipe')->toArray();
+        // dd($type);
+        $solusi_ideal_negatif = [];
+        for ($j = 0; $j < count($matriksNormalisasiTerbobot[0]); $j++) {
+            $column = array_column($matriksNormalisasiTerbobot, $j);
+            $max = max($column);
+            $min = min($column);
+            if (isset($type[$j])) {
+                if ($type[$j] == 'Benefit' || $type[$j] == 'benefit') {
+                    $solusi_ideal_negatif[$j] = $min;
+                } else if ($type[$j] == 'Cost' || $type[$j] == 'cost') {
+                    $solusi_ideal_negatif[$j] = $max;
+                }
             }
         }
-        return $matriksPreferensi;
+        return $solusi_ideal_negatif;
     }
 
-    //create ranking where sort matriksPreferensi descending
+    private function hitungJarakSolusiIdealPositif($matriksNormalisasiTerbobot, $solusi_ideal_positif)
+    {
+        $jarak_solusi_ideal_positif = [];
+        for ($i = 0; $i < count($matriksNormalisasiTerbobot); $i++) {
+            $jarak = 0;
+
+            for ($j = 0; $j < count($matriksNormalisasiTerbobot[0]); $j++) {
+                if (isset($solusi_ideal_positif[$j])) {
+                    $jarak += pow(($solusi_ideal_positif[$j] - $matriksNormalisasiTerbobot[$i][$j]), 2);
+                }
+            }
+            $jarak_solusi_ideal_positif[$i] = number_format(sqrt($jarak), 4);
+        }
+        return $jarak_solusi_ideal_positif;
+    }
+
+    private function hitungJarakSolusiIdealNegatif($matriksNormalisasiTerbobot, $solusi_ideal_negatif)
+    {
+        $jarak_solusi_ideal_negatif = [];
+        for ($i = 0; $i < count($matriksNormalisasiTerbobot); $i++) {
+            $jarak = 0;
+
+            for ($j = 0; $j < count($matriksNormalisasiTerbobot[0]); $j++) {
+                if (isset($solusi_ideal_negatif[$j])) {
+                    $jarak += pow(($matriksNormalisasiTerbobot[$i][$j] - $solusi_ideal_negatif[$j]), 2);
+                }
+            }
+            $jarak_solusi_ideal_negatif[$i] = number_format(sqrt($jarak), 4);
+        }
+        return $jarak_solusi_ideal_negatif;
+    }
+
+    private function hitungNilaiPreferensi($jarak_solusi_ideal_positif, $jarak_solusi_ideal_negatif)
+    {
+        $nilai_preferensi = [];
+        for ($i = 0; $i < count($jarak_solusi_ideal_positif); $i++) {
+            $nilai_preferensi[$i] = number_format($jarak_solusi_ideal_negatif[$i] / ($jarak_solusi_ideal_positif[$i] + $jarak_solusi_ideal_negatif[$i]), 4);
+        }
+        return $nilai_preferensi;
+    }
     public function ranking($matriksPreferensi)
     {
         $ranking = [];
@@ -140,14 +183,4 @@ class PerhitunganController extends Controller
         arsort($ranking);
         return $ranking;
     }
-
-    //create ranking where sort matriksPreferensi descending using usort
-    // public function ranking($matriksPreferensi)
-    // {
-    //     $ranking = $matriksPreferensi;
-    //     usort($ranking, function ($a, $b) {
-    //         return $b <=> $a;
-    //     });
-    //     return $ranking;
-    // }
 }
