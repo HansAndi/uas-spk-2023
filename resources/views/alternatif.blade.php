@@ -43,7 +43,7 @@
                                     @endforeach
                                     <td>
                                         <button data-bs-toggle="modal" data-bs-target="#inputNilai"
-                                            onclick='setAlternatif(@json($item))'
+                                            onclick='setAlternatif(@json($item), @json($kriteria), @json($subKriteria), @json($alternatifKriteriaGrouped))'
                                             class="btn btn-warning">Input
                                             Nilai</button>
                                         <button type="button" class="btn btn-danger" data-bs-toggle="modal"
@@ -67,7 +67,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Alternatif</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -102,43 +102,10 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        @csrf
+                    @csrf
+                    <input name="alternatif_id" id="idAlternatif" type="hidden">
+                    <div class="modal-body" id="addValueAlternatifKriteria">
 
-                        <input name="alternatif_id" id="idAlternatif" type="hidden">
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                @foreach ($kriteria->take($kriteria->count() / 2) as $krt)
-                                    <div class="form-group">
-                                        <label for="nama_kriteria">{{ $krt->nama_kriteria }}</label>
-                                        <select name="value[]" id="idKriteria" class="form-control">
-                                            @foreach ($subKriteria as $sk)
-                                                @if ($sk->kriteria_id == $krt->id)
-                                                    <option value="{{ $sk->value }}">{{ $sk->range_kriteria }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        <input name="id[]" id="idKriteria" type="hidden" value="{{ $krt->id }}">
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div class="col-md-6">
-                                @foreach ($kriteria->skip($kriteria->count() / 2) as $krt)
-                                    <div class="form-group">
-                                        <label for="nama_kriteria">{{ $krt->nama_kriteria }}</label>
-                                        <select name="value[]" id="idKriteria" class="form-control">
-                                            @foreach ($subKriteria as $sk)
-                                                @if ($sk->kriteria_id == $krt->id)
-                                                    <option value="{{ $sk->value }}">{{ $sk->range_kriteria }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        <input name="id[]" id="idKriteria" type="hidden" value="{{ $krt->id }}">
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -181,13 +148,42 @@
             $('#deleteAlternatif').attr('action', '{{ url('alternatif') }}/' + alternatif.id);
         }
 
-        // let alternatif;
-
-        function setAlternatif(newAlternatif) {
+        function setAlternatif(newAlternatif, kriteria, subKriteria, ak) {
             alternatif = newAlternatif;
             console.log(alternatif)
             document.getElementById('namaAlternatif').value = alternatif.nama_alternatif;
             document.getElementById('idAlternatif').value = alternatif.id;
+            var container = document.getElementById('addValueAlternatifKriteria');
+            container.innerHTML = '';
+            kriteria.forEach(function(krt) {
+                container.innerHTML += generateKriteriaHTML(alternatif.id, krt, subKriteria, ak);
+            });
+        }
+
+        function generateKriteriaHTML(idAlterinatif, kriteria, subKriteria, ak) {
+            var html = '<div class="form-group">';
+            html += '<label for="nama_kriteria">' + kriteria.nama_kriteria + '</label>';
+            html += '<select name="value[]" class="form-control">';
+
+            // Filter subKriteria based on the current kriteria id
+            var filteredSubKriteria = subKriteria.filter(function(sk) {
+                return sk.kriteria_id === kriteria.id;
+            });
+
+            // Iterate over filtered subKriteria to create options
+            filteredSubKriteria.forEach(function(sk) {
+                // console.log(ak[idAlterinatif][kriteria.id][0].value);
+                if (ak[idAlterinatif] === undefined || ak[idAlterinatif][kriteria.id][0].value !== sk.value) {
+                    html += '<option value="' + sk.value + '">' + sk.range_kriteria + '</option>';
+                } else {
+                    html += '<option value="' + sk.value + '" selected>' + sk.range_kriteria + '</option>';
+                }
+            });
+
+            html += '</select>';
+            html += '<input name="id[]" type="hidden" value="' + kriteria.id + '">';
+            html += '</div>';
+            return html;
         }
     </script>
 @endsection

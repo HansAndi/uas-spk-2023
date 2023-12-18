@@ -1,20 +1,10 @@
 @extends('layouts.main')
 
-@section('title', 'Kriteria')
+@section('title', 'Sub Kriteria')
 
-@section('page-title', 'Kriteria')
+@section('page-title', 'Sub Kriteria')
 
 @section('content')
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Sub Kriteria</h1>
-                </div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
-
     <!-- Main content -->
 
 
@@ -66,10 +56,10 @@
                                         <td>
                                             <button data-bs-target="#updateSubKriteriaModal" data-bs-toggle="modal"
                                                 class="btn btn-warning"
-                                                onclick="setSubKriteria({{ $sub_item }})">Edit</button>
+                                                onclick="updateSubKriteria({{ $sub_item }})">Edit</button>
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                                 data-bs-target="#deleteSubButton"
-                                                onclick="setSubKriteria({{ $sub_item }})">
+                                                onclick="deleteSubKriteria({{ $sub_item }})">
                                                 Hapus
                                             </button>
                                         </td>
@@ -98,13 +88,13 @@
                     <form action="{{ url('sub_kriteria') }}" method="POST">
                         @csrf
                         <div class="form-group">
-                            <label for="nama">Rentang Kriteria</label>
+                            <label for="range_kriteria">Rentang Kriteria</label>
                             <input type="text" class="form-control" id="nama"
                                 placeholder="Masukkan Rentang Kriteria" name="range_kriteria">
                         </div>
                         <div class="form-group">
                             <label for="bobot">Nilai</label>
-                            <input type="number" step="0.01" class="form-control" id="bobot"
+                            <input type="number" step="any" class="form-control" id="bobot"
                                 placeholder="Masukkan Nilai" name="value">
                         </div>
                         <input type="hidden" class="form-control" id="kriteria_id" name="kriteria_id" value="">
@@ -133,13 +123,13 @@
                         @csrf
                         @method('PUT')
                         <div class="form-group">
-                            <label for="nama">Rentang Kriteria</label>
+                            <label for="range_kriteria">Rentang Kriteria</label>
                             <input type="text" class="form-control" id="updateRangeKriteria"
-                                placeholder="Masukkan Rentang Kriteria" name="rangeKriteria">
+                                placeholder="Masukkan Rentang Kriteria" name="range_kriteria">
                         </div>
                         <div class="form-group">
                             <label for="bobot">Nilai</label>
-                            <input type="number" step="0.01" class="form-control" id="updateBobot"
+                            <input type="number" step="any" class="form-control" id="updateBobot"
                                 placeholder="Masukkan Nilai" name="value">
                         </div>
                         <input type="hidden" class="form-control" id="updateIdSubKriteria" name="id"
@@ -192,19 +182,26 @@
 </script>
 <script>
     // kriteria hold the value of kriteria in json format
-    const sub_kriteria = null;
+    // const sub_kriteria = null;
 
-    function setSubKriteria(sub_kriteria) {
+    function updateSubKriteria(sub_kriteria) {
         sub_kriteria = sub_kriteria;
 
         // ganti action form dari tag dengan deleteSubForm
         console.log(sub_kriteria)
-        $('#deleteSubForm').attr('action', '{{ url('sub_kriteria') }}/' + sub_kriteria.id)
-        $('#updateSubForm').attr('action', '{{ url('sub_kriteria') }}/' + sub_kriteria.id)
-        document.getElementById('titleDeleteSubForm').innerHTML = sub_kriteria.range_kriteria
-
+        $('#updateIdSubKriteria').val(sub_kriteria.id)
         $('#updateRangeKriteria').val(sub_kriteria.range_kriteria)
         $('#updateBobot').val(sub_kriteria.value)
-        $('#updateIdSubKriteria').val(sub_kriteria.id)
+
+        // $('#deleteSubForm').attr('action', '{{ url('sub_kriteria') }}/' + sub_kriteria.id)
+        $('#updateSubForm').attr('action', '{{ url('sub_kriteria') }}/' + sub_kriteria.id)
+        // document.getElementById('titleDeleteSubForm').innerHTML = sub_kriteria.range_kriteria
+
+    }
+
+    function deleteSubKriteria(sub_kriteria) {
+        sub_kriteria = sub_kriteria;
+        // console.log(kriteria.id);
+        $('#deleteSubForm').attr('action', '{{ url('sub_kriteria') }}/' + sub_kriteria.id);
     }
 </script>
