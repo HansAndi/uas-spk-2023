@@ -80,7 +80,7 @@
                         </div>
                         <div class="form-group">
                             <label for="tipe">Atribut</label>
-                            <select name="tipe" id="tipe">
+                            <select name="tipe" class="form-select" id="tipe">
                                 <option value="Benefit">Benefit</option>
                                 <option value="cost">Cost</option>
                             </select>
@@ -122,7 +122,7 @@
                         </div>
                         <div class="form-group">
                             <label for="tipe">Atribut</label>
-                            <select name="tipe" id="updateKriteriaJenis">
+                            <select name="tipe" class="form-select" id="updateKriteriaJenis">
                                 <option value="Benefit">Benefit</option>
                                 <option value="cost">Cost</option>
                             </select>

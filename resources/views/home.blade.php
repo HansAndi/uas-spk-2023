@@ -8,7 +8,7 @@
 
     <section class="row">
         <div class="col-12 col-lg-9">
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
                         <div class="card-body px-4 py-4-5">
@@ -77,20 +77,51 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <div class="row">
-                <div class="col-12">
+                <div class="col-11">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Profile Visit</h4>
+                            <h4>Metode TOPSIS</h4>
                         </div>
                         <div class="card-body">
-                            <div id="chart-profile-visit"></div>
+                            {{-- <div id="chart-profile-visit"></div> --}}
+                            <div class="text-justify">
+                                <p>
+                                    Metode TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution) adalah
+                                    salah satu metode pengambilan keputusan multi-kriteria yang digunakan untuk merangkum,
+                                    menyederhanakan, dan memprioritaskan alternatif berdasarkan kriteria tertentu. Metode
+                                    ini membantu dalam menentukan alternatif terbaik dari sekelompok opsi yang tersedia.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="row">
+                <div class="col-11 text-justify">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Studi Kasus</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-justify">
+                                Seorang pecinta game yang berkeinginan memperoleh pengalaman bermain yang optimal sedang
+                                mempertimbangkan pembelian laptop baru. Keputusan ini dianggap sebagai investasi penting,
+                                mengingat bahwa kecepatan, grafis, dan performa keseluruhan laptop akan mempengaruhi secara
+                                signifikan pengalaman bermain game. Oleh karena itu, pengguna memilih untuk menerapkan
+                                metode TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution) guna
+                                mendukung proses pemilihan laptop terbaik. Kriteria pemilihan spesifikasi laptop yang
+                                menjadi pertimbangan melibatkan faktor processor, GPU, RAM, display layar, storage, baterai,
+                                berat, garansi, dan harga. Dalam rangka memastikan keputusan yang tepat, pengguna akan
+                                mengevaluasi 30 alternatif laptop dengan cermat.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- <div class="row">
                 <div class="col-12 col-xl-4">
                     <div class="card">
                         <div class="card-header">
@@ -245,9 +276,50 @@
                         </div>
                     </div>
                 </div>
+            </div> --}}
+        </div>
+
+        <div class="col-12 col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Metode TOPSIS</h4>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <ol>
+                            <li type="1">
+                                <p class="text-justify">
+                                    Membuat matriks keputusan yang ternormalisasi (R)
+                                </p>
+                            </li>
+                            <li>
+                                <p class="text-justify">
+                                    Membuat matriks keputusan yang ternormalisasi terbobot (Y)
+                                </p>
+                            </li>
+                            <li>
+                                <p class="text-justify">
+                                    Menentukan matriks solusi ideal positif (A+) dan matriks solusi ideal negatif (A-)
+                                </p>
+                            </li>
+                            <li>
+                                <p class="text-justify">
+                                    Menentukan jarak antara nilai setiap alternatif dengan matriks solusi ideal positif
+                                    dan negatif (D)
+                                </p>
+                            </li>
+                            <li>
+                                <p class="text-justify">
+                                    Menentukan nilai preferensi untuk setiap alternatif (V)
+                                </p>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-12 col-lg-3">
+
+        {{-- <div class="col-12 col-lg-3">
             <div class="card">
                 <div class="card-body py-4 px-4">
                     <div class="d-flex align-items-center">
@@ -307,7 +379,7 @@
                     <div id="chart-visitors-profile"></div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </section>
 
 @endsection
